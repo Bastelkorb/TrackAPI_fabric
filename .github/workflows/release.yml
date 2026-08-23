@@ -1,4 +1,4 @@
-name: TrackAPI Forge-like Release CI
+name: TrackAPI Fabric Release CI
 
 on: [workflow_dispatch]
 
@@ -9,44 +9,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: 'forge_1.7.10'
+          - branch: 'fabric_1.16.5'
             java-version: '8'
-          - branch: 'forge_1.10.2'
-            java-version: '8'
-          - branch: 'forge_1.11.2'
-            java-version: '8'
-          - branch: 'forge_1.12.2'
-            java-version: '8'
-          - branch: 'forge_1.14.4'
-            java-version: '8'
-          - branch: 'forge_1.15.2'
-            java-version: '8'
-          - branch: 'forge_1.16.5'
-            java-version: '8'
-          - branch: 'forge_1.17.1'
-            java-version: '16'
-          - branch: 'forge_1.18.2'
+          - branch: 'fabric_1.18.2'
             java-version: '17'
-          - branch: 'forge_1.19.4'
+          - branch: 'fabric_1.19.4'
             java-version: '17'
-          - branch: 'forge_1.20.1'
+          - branch: 'fabric_1.20.1'
             java-version: '17'
-          - branch: 'forge_1.21.1'
+          - branch: 'fabric_1.20.4'
+            java-version: '17'
+          - branch: 'fabric_1.21.1'
             java-version: '21'
-          - branch: 'neoforge_1.21.1'
+          - branch: 'fabric_1.21.4'
             java-version: '21'
-          - branch: 'forge_1.21.4'
+          - branch: 'fabric_1.21.8'
             java-version: '21'
-          - branch: 'neoforge_1.21.4'
-            java-version: '21'
-          - branch: 'forge_1.21.8'
-            java-version: '21'
-          - branch: 'neoforge_1.21.8'
-            java-version: '21'
-          - branch: 'forge_26.1.2'
-            java-version: '25'
-          - branch: 'neoforge_26.1.2'
-            java-version: '25'
 
     steps:
       - uses: actions/checkout@v5
