@@ -1,89 +1,82 @@
-buildscript {
-    repositories {
-        maven { url = "https://maven.minecraftforge.net/" }
-        maven { url "https://plugins.gradle.org/" }
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3.2'
-    }
+plugins {
+	id 'fabric-loom' version "${loom_version}"
+	id 'maven-publish'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven-publish'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-String baseVersion = "1.3"
-if (!"release".equalsIgnoreCase(System.getProperty("target"))) {
-    try {
-        baseVersion += "-" + 'git rev-parse --verify --short=7 HEAD'.execute().text.trim()
-    } catch (Exception ex) {
-        baseVersion += "-unknown"
-    }
-}
-version = "1.12.2-forge-" + baseVersion
-group = "trackapi" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "TrackAPI"
-
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
-minecraft {
-    version = "1.12.2-14.23.5.2847"
-    runDir = "run"
-
-    mappings = "stable_39"
-}
+archivesBaseName = "${mod_id}-${minecraft_version}"
+version = "${minecraft_version}-fabric-${mod_version}"
+group = "trackapi"
 
 dependencies {
-    compile "org.apache.maven.wagon:wagon-ssh:3.5.3"
+	// Minecraft
+	minecraft "com.mojang:minecraft:${minecraft_version}"
+	mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+
+	// Fabric API
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+	
+	// Fabric Loader
+	modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 }
 
-jar.finalizedBy('reobfJar')
-
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+	inputs.property "version", project.version
+	inputs.property "minecraft_version", project.minecraft_version
+	inputs.property "mod_id", project.mod_id
+	inputs.property "mod_name", project.mod_name
+	inputs.property "mod_description", project.mod_description
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+	from(sourceSets.main.resources.srcDirs) {
+		include "fabric.mod.json"
+		expand "version": project.version,
+			"minecraft_version": project.minecraft_version,
+			"mod_id": project.mod_id,
+			"mod_name": project.mod_name,
+			"mod_description": project.mod_description
+	}
+
+	from(sourceSets.main.resources.srcDirs) {
+		exclude "fabric.mod.json"
+	}
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-in-gradle/
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+java {
+	withSourcesJar()
+}
+
+jar {
+	from "LICENSE"
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-            artifact sourceJar
-            artifactId archivesBaseName
-        }
-    }
-    repositories {
-        maven {
-            url "sftp://teamopenindustry.cc:22/var/www/html/maven/"
-            credentials {
-                username = "mavenci"
-                password = System.getenv("MAVENCI_PASS")
-            }
-        }
-    }
+	publications {
+		mavenJava(MavenPublication) {
+			artifact remapJar {
+				builtBy remapJar
+			}
+			artifact sourcesJar {
+				builtBy remapSourcesJar
+			}
+		}
+	}
+	repositories {
+		// Add your publish repositories here
+		// maven {
+		// 	url "sftp://teamopenindustry.cc:22/var/www/html/maven/"
+		// 	credentials {
+		// 		username = System.getenv("MAVENCI_USER")
+		// 		password = System.getenv("MAVENCI_PASS")
+		// 	}
+		// }
+	}
 }
-
-task ('showBuildInfo') {
-    doLast {
-        System.out.println("Build Uploaded to Maven at: ")
-        System.out.println("https://teamopenindustry.cc/maven/trackapi/TrackAPI/${version}/TrackAPI-${version}.jar")
-    }
-}
-
-publish.finalizedBy showBuildInfo
-
