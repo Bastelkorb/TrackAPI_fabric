@@ -1,4 +1,3 @@
-```yaml
 name: TrackAPI Fabric CI
 
 on:
@@ -27,7 +26,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '11'
           cache: gradle
 
       - name: Make Gradle executable
@@ -51,4 +50,3 @@ jobs:
           name: TrackAPI-Fabric-${{ steps.branch.outputs.ref }}
           path: build/libs/*.jar
           if-no-files-found: error
-```
