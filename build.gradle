@@ -1,25 +1,26 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-archivesBaseName = "${mod_id}-${minecraft_version}"
-version = "${minecraft_version}-fabric-${mod_version}"
+archivesBaseName = project.mod_id
+version = project.minecraft_version + "-fabric-" + project.mod_version
 group = "trackapi"
 
-dependencies {
-	// Minecraft
-	minecraft "com.mojang:minecraft:${minecraft_version}"
-	mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+repositories {
+	maven { url "https://maven.fabricmc.net/" }
+	maven { url "https://maven.minecraftforge.net/" }
+	mavenCentral()
+}
 
-	// Fabric API
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
-	
-	// Fabric Loader
-	modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 processResources {
@@ -28,6 +29,7 @@ processResources {
 	inputs.property "mod_id", project.mod_id
 	inputs.property "mod_name", project.mod_name
 	inputs.property "mod_description", project.mod_description
+	inputs.property "mod_author", project.mod_author
 
 	from(sourceSets.main.resources.srcDirs) {
 		include "fabric.mod.json"
@@ -35,7 +37,8 @@ processResources {
 			"minecraft_version": project.minecraft_version,
 			"mod_id": project.mod_id,
 			"mod_name": project.mod_name,
-			"mod_description": project.mod_description
+			"mod_description": project.mod_description,
+			"mod_author": project.mod_author
 	}
 
 	from(sourceSets.main.resources.srcDirs) {
@@ -43,9 +46,6 @@ processResources {
 	}
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-in-gradle/
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
@@ -70,13 +70,12 @@ publishing {
 		}
 	}
 	repositories {
-		// Add your publish repositories here
-		// maven {
-		// 	url "sftp://teamopenindustry.cc:22/var/www/html/maven/"
-		// 	credentials {
-		// 		username = System.getenv("MAVENCI_USER")
-		// 		password = System.getenv("MAVENCI_PASS")
-		// 	}
-		// }
+		maven {
+			url "sftp://teamopenindustry.cc:22/var/www/html/maven/"
+			credentials {
+				username = System.getenv("MAVENCI_USER")
+				password = System.getenv("MAVENCI_PASS")
+			}
+		}
 	}
 }
