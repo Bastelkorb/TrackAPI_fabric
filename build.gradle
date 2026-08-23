@@ -3,8 +3,8 @@ plugins {
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 archivesBaseName = project.mod_id
 version = project.minecraft_version + "-fabric-" + project.mod_version
@@ -61,12 +61,8 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact remapJar {
-				builtBy remapJar
-			}
-			artifact sourcesJar {
-				builtBy remapSourcesJar
-			}
+			artifact remapJar
+			artifact sourcesJar
 		}
 	}
 	repositories {
