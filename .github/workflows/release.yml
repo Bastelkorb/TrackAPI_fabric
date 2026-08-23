@@ -10,7 +10,7 @@ jobs:
       matrix:
         include:
           - branch: 'fabric_1.16.5'
-            java-version: '8'
+            java-version: '11'
           - branch: 'fabric_1.18.2'
             java-version: '17'
           - branch: 'fabric_1.19.4'
